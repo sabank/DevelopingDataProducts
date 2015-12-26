@@ -18,14 +18,14 @@ dataset <- file[,c(7,2,8,23:24)]
 ## date
 newdataset <- dataset %>%
   mutate(bgndate = format(as.Date(as.POSIXct(BGN_DATE, format = "%m/%e/%Y %k:%M:%S")),format="%Y-%m-%e"),
-         bgnyear = as.numeric(format(as.POSIXct(BGN_DATE, format = "%m/%e/%Y %k:%M:%S"),format="%Y")))
+         Year = as.numeric(format(as.POSIXct(BGN_DATE, format = "%m/%e/%Y %k:%M:%S"),format="%Y")))
 ## event
 newdataset$EVTYPE <- toupper(newdataset$EVTYPE)
 ## fatalities + injuries
 nd <- newdataset[,-c(2,6)]
-nd_g <- group_by(nd,bgnyear,STATE,EVTYPE,humdmg=FATALITIES+INJURIES,evfreq=frequency(EVTYPE))
+nd_g <- group_by(nd,Year,STATE,EVTYPE,Fatalities=FATALITIES+INJURIES,Occurrence=frequency(EVTYPE))
 ndyear <- nd_g[,-c(3:4)]
-humcost <- aggregate(cbind(humdmg,evfreq) ~ STATE+bgnyear, data=ndyear,sum)
+humcost <- aggregate(cbind(Fatalities,Occurrence) ~ STATE+Year, data=ndyear,sum)
 
 # write csv file
 write.csv(humcost,"./data/humcost.csv",row.names = FALSE,quote = TRUE,na="NA")
